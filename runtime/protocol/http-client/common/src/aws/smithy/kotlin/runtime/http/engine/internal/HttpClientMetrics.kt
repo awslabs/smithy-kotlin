@@ -25,7 +25,12 @@ public object HttpClientMetricAttributes {
     public val AcquiredConnection: Attributes = attributesOf { "state" to "acquired" }
     public val QueuedRequest: Attributes = attributesOf { "state" to "queued" }
     public val InFlightRequest: Attributes = attributesOf { "state" to "in-flight" }
+    public val IdleThread: Attributes = attributesOf { "state" to "idle" }
+    public val ActiveThread: Attributes = attributesOf { "state" to "active" }
 }
+
+@InternalApi
+public data class ThreadState(val idle: Long, val active: Long)
 
 /**
  * Container for common HTTP engine related metrics. Engine implementations can re-use this and update
@@ -39,6 +44,7 @@ public object HttpClientMetricAttributes {
 public class HttpClientMetrics(
     scope: String,
     public val provider: TelemetryProvider,
+    threadStateCallback: (() -> ThreadState?)? = null,
 ) : Closeable {
     private val meter = provider.meterProvider.getOrCreateMeter(scope)
 
@@ -76,34 +82,6 @@ public class HttpClientMetrics(
         "The amount of time a connection has been open",
     )
 
-    private val connectionLimitHandle = meter.createAsyncUpDownCounter(
-        "smithy.client.http.connections.limit",
-        { it.record(_connectionsLimit.value) },
-        "{connection}",
-        "Max connections configured for the HTTP client",
-    )
-
-    private val connectionUsageHandle = meter.createAsyncUpDownCounter(
-        "smithy.client.http.connections.usage",
-        ::recordConnectionState,
-        "{connection}",
-        "Current state of connections (idle, acquired)",
-    )
-
-    private val requestsConcurrencyLimitHandle = meter.createAsyncUpDownCounter(
-        "smithy.client.http.requests.limit",
-        { it.record(_requestConcurrencyLimit.value) },
-        "{request}",
-        "Max concurrent requests configured for the HTTP client",
-    )
-
-    private val requestsHandle = meter.createAsyncUpDownCounter(
-        "smithy.client.http.requests.usage",
-        ::recordRequestsState,
-        "{request}",
-        "The current state of HTTP client request concurrency (queued, in-flight)",
-    )
-
     public val bytesSent: MonotonicCounter = meter.createMonotonicCounter(
         "smithy.client.http.bytes_sent",
         "By",
@@ -120,6 +98,41 @@ public class HttpClientMetrics(
         "smithy.client.http.time_to_first_byte",
         "s",
         "The amount of time after a request has been sent spent waiting on a response from the remote server",
+    )
+
+    private val asyncHandles = listOfNotNull(
+        meter.createAsyncUpDownCounter(
+            "smithy.client.http.connections.limit",
+            { it.record(_connectionsLimit.value) },
+            "{connection}",
+            "Max connections configured for the HTTP client",
+        ),
+        meter.createAsyncUpDownCounter(
+            "smithy.client.http.connections.usage",
+            ::recordConnectionState,
+            "{connection}",
+            "Current state of connections (idle, acquired)",
+        ),
+        meter.createAsyncUpDownCounter(
+            "smithy.client.http.requests.limit",
+            { it.record(_requestConcurrencyLimit.value) },
+            "{request}",
+            "Max concurrent requests configured for the HTTP client",
+        ),
+        meter.createAsyncUpDownCounter(
+            "smithy.client.http.requests.usage",
+            ::recordRequestsState,
+            "{request}",
+            "The current state of HTTP client request concurrency (queued, in-flight)",
+        ),
+        threadStateCallback?.let { callback ->
+            meter.createAsyncUpDownCounter(
+                "smithy.client.http.threads.count",
+                { measurement -> recordThreadState(measurement, callback) },
+                "{thread}",
+                "Current state of HTTP engine threads (idle, active)",
+            )
+        },
     )
 
     /**
@@ -186,13 +199,17 @@ public class HttpClientMetrics(
         measurement.record(acquiredConnections, HttpClientMetricAttributes.AcquiredConnection)
     }
 
+    private fun recordThreadState(measurement: LongAsyncMeasurement, callback: () -> ThreadState?) {
+        callback()?.let { threadState ->
+            measurement.record(threadState.idle, HttpClientMetricAttributes.IdleThread)
+            measurement.record(threadState.active, HttpClientMetricAttributes.ActiveThread)
+        }
+    }
+
     override fun close() {
-        val exceptions = listOf(
-            runCatching(connectionLimitHandle::stop),
-            runCatching(connectionUsageHandle::stop),
-            runCatching(requestsHandle::stop),
-            runCatching(requestsConcurrencyLimitHandle::stop),
-        ).mapNotNull(Result<*>::exceptionOrNull)
+        val exceptions = asyncHandles
+            .map { handle -> runCatching { handle.stop() } }
+            .mapNotNull(Result<*>::exceptionOrNull)
 
         exceptions.firstOrNull()?.let { first ->
             exceptions.drop(1).forEach(first::addSuppressed)

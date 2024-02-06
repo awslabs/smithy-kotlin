@@ -9,6 +9,7 @@ import aws.smithy.kotlin.runtime.http.HttpCall
 import aws.smithy.kotlin.runtime.http.config.EngineFactory
 import aws.smithy.kotlin.runtime.http.engine.*
 import aws.smithy.kotlin.runtime.http.engine.internal.HttpClientMetrics
+import aws.smithy.kotlin.runtime.http.engine.internal.ThreadState
 import aws.smithy.kotlin.runtime.http.request.HttpRequest
 import aws.smithy.kotlin.runtime.net.TlsVersion
 import aws.smithy.kotlin.runtime.operation.ExecutionContext
@@ -16,6 +17,7 @@ import aws.smithy.kotlin.runtime.time.Instant
 import aws.smithy.kotlin.runtime.time.fromEpochMilliseconds
 import kotlinx.coroutines.job
 import okhttp3.*
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import kotlin.time.toJavaDuration
 import aws.smithy.kotlin.runtime.net.TlsVersion as SdkTlsVersion
@@ -40,8 +42,13 @@ public class OkHttpEngine(
         override val engineConstructor: (OkHttpEngineConfig.Builder.() -> Unit) -> OkHttpEngine = ::invoke
     }
 
-    private val metrics = HttpClientMetrics(TELEMETRY_SCOPE, config.telemetryProvider)
-    private val client = config.buildClient(metrics)
+    private val dispatcher = config.buildDispatcher()
+    private val metrics = HttpClientMetrics(
+        scope = TELEMETRY_SCOPE,
+        provider = config.telemetryProvider,
+        threadStateCallback = dispatcher::getThreadState,
+    )
+    private val client = config.buildClient(dispatcher, metrics)
 
     override suspend fun roundTrip(context: ExecutionContext, request: HttpRequest): HttpCall {
         val callContext = callContext()
@@ -68,10 +75,21 @@ public class OkHttpEngine(
     }
 }
 
+private fun Dispatcher.getThreadState(): ThreadState? = (executorService as? ThreadPoolExecutor)?.let { executor ->
+    val active = executor.activeCount.toLong()
+    val idle = executor.poolSize.toLong() - active
+    ThreadState(idle, active)
+}
+
+private fun OkHttpEngineConfig.buildDispatcher() = Dispatcher().apply {
+    maxRequests = maxConcurrency.toInt()
+    maxRequestsPerHost = maxConcurrencyPerHost.toInt()
+}
+
 /**
  * Convert SDK version of HTTP configuration to OkHttp specific configuration and return the configured client
  */
-private fun OkHttpEngineConfig.buildClient(metrics: HttpClientMetrics): OkHttpClient {
+private fun OkHttpEngineConfig.buildClient(dispatcher: Dispatcher, metrics: HttpClientMetrics): OkHttpClient {
     val config = this
 
     return OkHttpClient.Builder().apply {
@@ -100,10 +118,6 @@ private fun OkHttpEngineConfig.buildClient(metrics: HttpClientMetrics): OkHttpCl
         )
         connectionPool(pool)
 
-        val dispatcher = Dispatcher().apply {
-            maxRequests = config.maxConcurrency.toInt()
-            maxRequestsPerHost = config.maxConcurrencyPerHost.toInt()
-        }
         dispatcher(dispatcher)
 
         // Log events coming from okhttp. Allocate a new listener per-call to facilitate dedicated trace spans.
