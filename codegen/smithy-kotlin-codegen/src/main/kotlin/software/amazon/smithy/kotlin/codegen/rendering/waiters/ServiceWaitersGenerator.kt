@@ -11,6 +11,7 @@ import software.amazon.smithy.kotlin.codegen.integration.KotlinIntegration
 import software.amazon.smithy.kotlin.codegen.model.expectShape
 import software.amazon.smithy.kotlin.codegen.model.getTrait
 import software.amazon.smithy.model.Model
+import software.amazon.smithy.model.knowledge.TopDownIndex
 import software.amazon.smithy.model.shapes.OperationShape
 import software.amazon.smithy.model.shapes.ServiceShape
 import software.amazon.smithy.waiters.*
@@ -20,7 +21,9 @@ import software.amazon.smithy.waiters.*
  */
 class ServiceWaitersGenerator : KotlinIntegration {
     override fun enabledForService(model: Model, settings: KotlinSettings): Boolean =
-        model.operationShapes.any { it.waitableTrait != null }
+        TopDownIndex.of(model)
+            .getContainedOperations(settings.service)
+            .any { it.waitableTrait != null }
 
     override fun writeAdditionalFiles(ctx: CodegenContext, delegator: KotlinDelegator) {
         delegator.useFileWriter("Waiters.kt", "${ctx.settings.pkg.name}.waiters") { writer ->

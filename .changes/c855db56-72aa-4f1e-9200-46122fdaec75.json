@@ -1,0 +1,5 @@
+{
+    "id": "c855db56-72aa-4f1e-9200-46122fdaec75",
+    "type": "bugfix",
+    "description": "Fix not generating waiters and paginators for operations that come from resources"
+}

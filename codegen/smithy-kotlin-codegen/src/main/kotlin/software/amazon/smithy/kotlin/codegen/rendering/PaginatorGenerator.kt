@@ -25,6 +25,7 @@ import software.amazon.smithy.kotlin.codegen.utils.getOrNull
 import software.amazon.smithy.model.Model
 import software.amazon.smithy.model.knowledge.PaginatedIndex
 import software.amazon.smithy.model.knowledge.PaginationInfo
+import software.amazon.smithy.model.knowledge.TopDownIndex
 import software.amazon.smithy.model.shapes.CollectionShape
 import software.amazon.smithy.model.shapes.MapShape
 import software.amazon.smithy.model.shapes.OperationShape
@@ -38,7 +39,9 @@ import software.amazon.smithy.model.traits.PaginatedTrait
  */
 class PaginatorGenerator : KotlinIntegration {
     override fun enabledForService(model: Model, settings: KotlinSettings): Boolean =
-        model.operationShapes.any { it.hasTrait<PaginatedTrait>() }
+        TopDownIndex.of(model)
+            .getContainedOperations(settings.service)
+            .any { it.hasTrait<PaginatedTrait>() }
 
     override fun writeAdditionalFiles(ctx: CodegenContext, delegator: KotlinDelegator) {
         val service = ctx.model.expectShape<ServiceShape>(ctx.settings.service)
