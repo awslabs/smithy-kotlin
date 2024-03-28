@@ -470,6 +470,17 @@ public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpDes
 	public abstract fun deserialize (Laws/smithy/kotlin/runtime/operation/ExecutionContext;Laws/smithy/kotlin/runtime/http/HttpCall;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpDeserializer {
+}
+
+public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpDeserializer$NonStreaming : aws/smithy/kotlin/runtime/http/operation/HttpDeserializer {
+	public abstract fun deserialize (Laws/smithy/kotlin/runtime/operation/ExecutionContext;Laws/smithy/kotlin/runtime/http/HttpCall;[B)Ljava/lang/Object;
+}
+
+public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpDeserializer$Streaming : aws/smithy/kotlin/runtime/http/operation/HttpDeserializer {
+	public abstract fun deserialize (Laws/smithy/kotlin/runtime/operation/ExecutionContext;Laws/smithy/kotlin/runtime/http/HttpCall;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class aws/smithy/kotlin/runtime/http/operation/HttpOperationContext {
 	public static final field INSTANCE Laws/smithy/kotlin/runtime/http/operation/HttpOperationContext;
 	public final fun getChecksumAlgorithm ()Laws/smithy/kotlin/runtime/collections/AttributeKey;
@@ -484,6 +495,17 @@ public final class aws/smithy/kotlin/runtime/http/operation/HttpOperationContext
 }
 
 public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpSerialize {
+	public abstract fun serialize (Laws/smithy/kotlin/runtime/operation/ExecutionContext;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpSerializer {
+}
+
+public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpSerializer$NonStreaming : aws/smithy/kotlin/runtime/http/operation/HttpSerializer {
+	public abstract fun serialize (Laws/smithy/kotlin/runtime/operation/ExecutionContext;Ljava/lang/Object;)Laws/smithy/kotlin/runtime/http/request/HttpRequestBuilder;
+}
+
+public abstract interface class aws/smithy/kotlin/runtime/http/operation/HttpSerializer$Streaming : aws/smithy/kotlin/runtime/http/operation/HttpSerializer {
 	public abstract fun serialize (Laws/smithy/kotlin/runtime/operation/ExecutionContext;Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -621,16 +643,20 @@ public final class aws/smithy/kotlin/runtime/http/operation/SdkHttpOperationBuil
 	public fun <init> (Lkotlin/reflect/KClass;Lkotlin/reflect/KClass;)V
 	public final fun build ()Laws/smithy/kotlin/runtime/http/operation/SdkHttpOperation;
 	public final fun getContext ()Laws/smithy/kotlin/runtime/operation/ExecutionContext;
+	public final fun getDeserializeWith ()Laws/smithy/kotlin/runtime/http/operation/HttpDeserializer;
 	public final fun getDeserializer ()Laws/smithy/kotlin/runtime/http/operation/HttpDeserialize;
 	public final fun getExecution ()Laws/smithy/kotlin/runtime/http/operation/SdkOperationExecution;
 	public final fun getHostPrefix ()Ljava/lang/String;
 	public final fun getOperationName ()Ljava/lang/String;
+	public final fun getSerializeWith ()Laws/smithy/kotlin/runtime/http/operation/HttpSerializer;
 	public final fun getSerializer ()Laws/smithy/kotlin/runtime/http/operation/HttpSerialize;
 	public final fun getServiceName ()Ljava/lang/String;
 	public final fun getTelemetry ()Laws/smithy/kotlin/runtime/http/operation/SdkOperationTelemetry;
+	public final fun setDeserializeWith (Laws/smithy/kotlin/runtime/http/operation/HttpDeserializer;)V
 	public final fun setDeserializer (Laws/smithy/kotlin/runtime/http/operation/HttpDeserialize;)V
 	public final fun setHostPrefix (Ljava/lang/String;)V
 	public final fun setOperationName (Ljava/lang/String;)V
+	public final fun setSerializeWith (Laws/smithy/kotlin/runtime/http/operation/HttpSerializer;)V
 	public final fun setSerializer (Laws/smithy/kotlin/runtime/http/operation/HttpSerialize;)V
 	public final fun setServiceName (Ljava/lang/String;)V
 }

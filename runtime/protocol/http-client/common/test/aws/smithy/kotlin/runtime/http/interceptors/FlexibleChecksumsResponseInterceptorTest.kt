@@ -25,11 +25,11 @@ data class TestOutput(val body: HttpBody)
 
 inline fun <reified I> newTestOperation(serialized: HttpRequestBuilder): SdkHttpOperation<I, TestOutput> =
     SdkHttpOperation.build<I, TestOutput> {
-        serializer = object : HttpSerialize<I> {
-            override suspend fun serialize(context: ExecutionContext, input: I): HttpRequestBuilder = serialized
+        serializeWith = object : HttpSerializer.NonStreaming<I> {
+            override fun serialize(context: ExecutionContext, input: I): HttpRequestBuilder = serialized
         }
 
-        deserializer = object : HttpDeserialize<TestOutput> {
+        deserializeWith = object : HttpDeserializer.Streaming<TestOutput> {
             override suspend fun deserialize(context: ExecutionContext, call: HttpCall): TestOutput = TestOutput(call.response.body)
         }
 

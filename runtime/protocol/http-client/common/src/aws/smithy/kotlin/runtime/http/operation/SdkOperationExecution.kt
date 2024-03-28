@@ -18,6 +18,7 @@ import aws.smithy.kotlin.runtime.http.auth.SignHttpRequest
 import aws.smithy.kotlin.runtime.http.complete
 import aws.smithy.kotlin.runtime.http.interceptors.InterceptorExecutor
 import aws.smithy.kotlin.runtime.http.middleware.RetryMiddleware
+import aws.smithy.kotlin.runtime.http.readAll
 import aws.smithy.kotlin.runtime.http.request.HttpRequestBuilder
 import aws.smithy.kotlin.runtime.http.request.dumpRequest
 import aws.smithy.kotlin.runtime.http.request.immutableView
@@ -26,7 +27,6 @@ import aws.smithy.kotlin.runtime.http.response.dumpResponse
 import aws.smithy.kotlin.runtime.io.Handler
 import aws.smithy.kotlin.runtime.io.middleware.Middleware
 import aws.smithy.kotlin.runtime.io.middleware.Phase
-import aws.smithy.kotlin.runtime.operation.ExecutionContext
 import aws.smithy.kotlin.runtime.retries.RetryStrategy
 import aws.smithy.kotlin.runtime.retries.StandardRetryStrategy
 import aws.smithy.kotlin.runtime.retries.policy.RetryPolicy
@@ -181,15 +181,15 @@ internal fun <Request, Response> SdkOperationExecution<Request, Response>.decora
     return OperationHandler(initializeHandler, interceptors)
 }
 
-private fun <I, O> HttpSerialize<I>.decorate(
+private fun <I, O> HttpSerializer<I>.decorate(
     inner: Handler<SdkHttpRequest, O>,
     interceptors: InterceptorExecutor<I, O>,
-): Handler<OperationRequest<I>, O> = SerializeHandler(inner, ::serialize, interceptors)
+): Handler<OperationRequest<I>, O> = SerializeHandler(inner, this, interceptors)
 
-private fun <I, O> HttpDeserialize<O>.decorate(
+private fun <I, O> HttpDeserializer<O>.decorate(
     inner: Handler<SdkHttpRequest, HttpCall>,
     interceptors: InterceptorExecutor<I, O>,
-): Handler<SdkHttpRequest, O> = DeserializeHandler(inner, ::deserialize, interceptors)
+): Handler<SdkHttpRequest, O> = DeserializeHandler(inner, this, interceptors)
 
 // internal glue used to marry one phase to another
 
@@ -230,7 +230,7 @@ private class InitializeHandler<Input, Output>(
 
 private class SerializeHandler<Input, Output> (
     private val inner: Handler<SdkHttpRequest, Output>,
-    private val mapRequest: suspend (ExecutionContext, Input) -> HttpRequestBuilder,
+    private val serializer: HttpSerializer<Input>,
     private val interceptors: InterceptorExecutor<Input, Output>,
 ) : Handler<OperationRequest<Input>, Output> {
 
@@ -243,7 +243,10 @@ private class SerializeHandler<Input, Output> (
         // store finalized operation input for later middleware to read if needed
         request.context[HttpOperationContext.OperationInput] = modified.subject as Any
 
-        val requestBuilder = mapRequest(modified.context, modified.subject)
+        val requestBuilder = when (serializer) {
+            is HttpSerializer.NonStreaming -> serializer.serialize(modified.context, modified.subject)
+            is HttpSerializer.Streaming -> serializer.serialize(modified.context, modified.subject)
+        }
         interceptors.readAfterSerialization(requestBuilder.immutableView())
 
         return inner.call(SdkHttpRequest(modified.context, requestBuilder))
@@ -317,7 +320,7 @@ internal class AuthHandler<Input, Output>(
 
 private class DeserializeHandler<Input, Output>(
     private val inner: Handler<SdkHttpRequest, HttpCall>,
-    private val mapResponse: suspend (ExecutionContext, HttpCall) -> Output,
+    private val deserializer: HttpDeserializer<Output>,
     private val interceptors: InterceptorExecutor<Input, Output>,
 ) : Handler<SdkHttpRequest, Output> {
 
@@ -329,7 +332,13 @@ private class DeserializeHandler<Input, Output>(
 
         interceptors.readBeforeDeserialization(modified)
 
-        val output = mapResponse(request.context, modified)
+        val output = when (deserializer) {
+            is HttpDeserializer.NonStreaming -> {
+                val payload = modified.response.body.readAll()
+                deserializer.deserialize(request.context, modified, payload)
+            }
+            is HttpDeserializer.Streaming -> deserializer.deserialize(request.context, modified)
+        }
         interceptors.readAfterDeserialization(output, modified)
 
         return output

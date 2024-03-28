@@ -55,9 +55,9 @@ object RuntimeTypes {
             val EndpointResolver = symbol("EndpointResolver")
             val ResolveEndpointRequest = symbol("ResolveEndpointRequest")
             val execute = symbol("execute")
-            val HttpDeserialize = symbol("HttpDeserialize")
+            val HttpDeserializer = symbol("HttpDeserializer")
             val HttpOperationContext = symbol("HttpOperationContext")
-            val HttpSerialize = symbol("HttpSerialize")
+            val HttpSerializer = symbol("HttpSerializer")
             val OperationAuthConfig = symbol("OperationAuthConfig")
             val OperationMetrics = symbol("OperationMetrics")
             val OperationRequest = symbol("OperationRequest")
@@ -407,8 +407,8 @@ object RuntimeTypes {
         val RestJsonErrorDeserializer = symbol("RestJsonErrorDeserializer")
     }
     object AwsXmlProtocols : RuntimeTypePackage(KotlinDependency.AWS_XML_PROTOCOLS) {
-        val parseRestXmlErrorResponse = symbol("parseRestXmlErrorResponse")
-        val parseEc2QueryErrorResponse = symbol("parseEc2QueryErrorResponse")
+        val parseRestXmlErrorResponseNoSuspend = symbol("parseRestXmlErrorResponseNoSuspend")
+        val parseEc2QueryErrorResponseNoSuspend = symbol("parseEc2QueryErrorResponseNoSuspend")
     }
 
     object AwsEventStream : RuntimeTypePackage(KotlinDependency.AWS_EVENT_STREAM) {

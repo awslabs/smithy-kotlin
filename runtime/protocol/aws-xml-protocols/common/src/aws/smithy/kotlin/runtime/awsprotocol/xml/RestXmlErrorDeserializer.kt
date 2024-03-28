@@ -32,8 +32,12 @@ internal data class XmlError(
  *
  * Returns parsed data in normalized form or throws [DeserializationException] if response cannot be parsed.
  */
+@Deprecated("use parseRestXmlErrorResponseNoSuspend")
 @InternalApi
-public suspend fun parseRestXmlErrorResponse(payload: ByteArray): ErrorDetails {
+public suspend fun parseRestXmlErrorResponse(payload: ByteArray): ErrorDetails =
+    parseRestXmlErrorResponseNoSuspend(payload)
+
+public fun parseRestXmlErrorResponseNoSuspend(payload: ByteArray): ErrorDetails {
     val details = XmlErrorDeserializer.deserialize(xmlTagReader(payload))
     return ErrorDetails(details.code, details.message, details.requestId)
 }

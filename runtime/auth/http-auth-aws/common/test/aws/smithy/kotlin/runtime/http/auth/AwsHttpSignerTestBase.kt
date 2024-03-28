@@ -41,6 +41,7 @@ public abstract class AwsHttpSignerTestBase(
 ) {
     private val testCredentials = Credentials("AKID", "SECRET", "SESSION")
 
+    @Suppress("DEPRECATION")
     private fun buildOperation(
         requestBody: String = "{\"TableName\": \"foo\"}",
         streaming: Boolean = false,

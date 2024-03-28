@@ -192,16 +192,16 @@ open class HttpProtocolClientGenerator(
             outputSymbolName,
         ) {
             if (inputShape.isPresent) {
-                writer.write("serializer = ${op.serializerName()}()")
+                writer.write("serializeWith = ${op.serializerName()}()")
             } else {
                 // no serializer implementation is generated for operations with no input, inline the HTTP
                 // protocol request from the operation itself
                 // NOTE: this will never be triggered for AWS models where we preprocess operations to always have inputs/outputs
                 writer.addImport(RuntimeTypes.Http.Request.HttpRequestBuilder)
                 writer.addImport(RuntimeTypes.Core.ExecutionContext)
-                writer.openBlock("serializer = object : HttpSerialize<#Q> {", "}", KotlinTypes.Unit) {
+                writer.openBlock("serializer = object : #T.NonStreaming<#Q> {", "}", RuntimeTypes.HttpClient.Operation.HttpSerializer, KotlinTypes.Unit) {
                     writer.openBlock(
-                        "override suspend fun serialize(context: ExecutionContext, input: #Q): HttpRequestBuilder {",
+                        "override fun serialize(context: ExecutionContext, input: #Q): HttpRequestBuilder {",
                         "}",
                         KotlinTypes.Unit,
                     ) {
@@ -215,7 +215,7 @@ open class HttpProtocolClientGenerator(
             }
 
             if (outputShape.isPresent) {
-                writer.write("deserializer = ${op.deserializerName()}()")
+                writer.write("deserializeWith = ${op.deserializerName()}()")
             } else {
                 writer.write("deserializer = UnitDeserializer")
             }

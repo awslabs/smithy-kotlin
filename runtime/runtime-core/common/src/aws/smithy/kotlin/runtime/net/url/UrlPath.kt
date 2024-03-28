@@ -28,7 +28,7 @@ public class UrlPath private constructor(
          * @param block The code to apply to the builder
          * @return A new [UrlPath] instance
          */
-        public operator fun invoke(block: Builder.() -> Unit): UrlPath = Builder().apply(block).build()
+        public inline operator fun invoke(block: Builder.() -> Unit): UrlPath = Builder().apply(block).build()
 
         private fun asDecoded(segments: List<Encodable>, trailingSlash: Boolean) =
             asString(segments, trailingSlash, Encodable::decoded)

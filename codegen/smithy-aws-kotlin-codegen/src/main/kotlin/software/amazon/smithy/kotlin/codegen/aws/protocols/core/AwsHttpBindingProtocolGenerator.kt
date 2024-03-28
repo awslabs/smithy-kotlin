@@ -84,10 +84,11 @@ abstract class AwsHttpBindingProtocolGenerator : HttpBindingProtocolGenerator() 
     override fun operationErrorHandler(ctx: ProtocolGenerator.GenerationContext, op: OperationShape): Symbol =
         op.errorHandler(ctx.settings) { writer ->
             writer.withBlock(
-                "private suspend fun ${op.errorHandlerName()}(context: #T, call: #T): #Q {",
+                "private fun ${op.errorHandlerName()}(context: #T, call: #T, payload: #T?): #Q {",
                 "}",
                 RuntimeTypes.Core.ExecutionContext,
                 RuntimeTypes.Http.HttpCall,
+                KotlinTypes.ByteArray,
                 KotlinTypes.Nothing,
             ) {
                 renderThrowOperationError(ctx, op, writer)
@@ -107,8 +108,7 @@ abstract class AwsHttpBindingProtocolGenerator : HttpBindingProtocolGenerator() 
             ),
         ) {
             val exceptionBaseSymbol = ExceptionBaseClassGenerator.baseExceptionSymbol(ctx.settings)
-            writer.write("val payload = call.response.body.#T()", RuntimeTypes.Http.readAll)
-                .write("val wrappedResponse = call.response.#T(payload)", RuntimeTypes.AwsProtocolCore.withPayload)
+            writer.write("val wrappedResponse = call.response.#T(payload)", RuntimeTypes.AwsProtocolCore.withPayload)
                 .write("val wrappedCall = call.copy(response = wrappedResponse)")
                 .write("")
                 .declareSection(
@@ -151,7 +151,7 @@ abstract class AwsHttpBindingProtocolGenerator : HttpBindingProtocolGenerator() 
                         name = "${errSymbol.name}Deserializer"
                         namespace = ctx.settings.pkg.serde
                     }
-                    writer.write("#S -> #T().deserialize(context, wrappedCall)", getErrorCode(ctx, err), errDeserializerSymbol)
+                    writer.write("#S -> #T().deserialize(context, wrappedCall, payload)", getErrorCode(ctx, err), errDeserializerSymbol)
                 }
                 write("else -> #T(errorDetails.message)", exceptionBaseSymbol)
             }

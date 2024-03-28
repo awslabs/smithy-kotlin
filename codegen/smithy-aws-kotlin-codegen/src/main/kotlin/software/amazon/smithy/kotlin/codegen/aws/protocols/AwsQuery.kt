@@ -45,7 +45,7 @@ class AwsQuery : QueryHttpBindingProtocolGenerator() {
         writer: KotlinWriter,
     ) {
         writer.write("""checkNotNull(payload){ "unable to parse error from empty response" }""")
-        writer.write("#T(payload)", RuntimeTypes.AwsXmlProtocols.parseRestXmlErrorResponse)
+        writer.write("#T(payload)", RuntimeTypes.AwsXmlProtocols.parseRestXmlErrorResponseNoSuspend)
     }
 }
 

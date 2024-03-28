@@ -40,7 +40,7 @@ class Ec2Query : QueryHttpBindingProtocolGenerator() {
         writer: KotlinWriter,
     ) {
         writer.write("""checkNotNull(payload){ "unable to parse error from empty response" }""")
-        writer.write("#T(payload)", RuntimeTypes.AwsXmlProtocols.parseEc2QueryErrorResponse)
+        writer.write("#T(payload)", RuntimeTypes.AwsXmlProtocols.parseEc2QueryErrorResponseNoSuspend)
     }
 }
 

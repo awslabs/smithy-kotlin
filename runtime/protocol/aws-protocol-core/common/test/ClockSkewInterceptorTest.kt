@@ -11,17 +11,14 @@ import aws.smithy.kotlin.runtime.awsprotocol.ClockSkewInterceptor.Companion.isSk
 import aws.smithy.kotlin.runtime.client.ResponseInterceptorContext
 import aws.smithy.kotlin.runtime.http.*
 import aws.smithy.kotlin.runtime.http.interceptors.HttpInterceptor
-import aws.smithy.kotlin.runtime.http.operation.HttpDeserialize
-import aws.smithy.kotlin.runtime.http.operation.HttpOperationContext
-import aws.smithy.kotlin.runtime.http.operation.HttpSerialize
-import aws.smithy.kotlin.runtime.http.operation.SdkHttpOperation
-import aws.smithy.kotlin.runtime.http.operation.roundTrip
+import aws.smithy.kotlin.runtime.http.operation.*
 import aws.smithy.kotlin.runtime.http.request.HttpRequest
 import aws.smithy.kotlin.runtime.http.request.HttpRequestBuilder
 import aws.smithy.kotlin.runtime.http.response.HttpResponse
 import aws.smithy.kotlin.runtime.httptest.TestEngine
 import aws.smithy.kotlin.runtime.io.SdkSource
 import aws.smithy.kotlin.runtime.io.source
+import aws.smithy.kotlin.runtime.operation.ExecutionContext
 import aws.smithy.kotlin.runtime.time.Instant
 import aws.smithy.kotlin.runtime.time.until
 import kotlinx.coroutines.test.runTest
@@ -188,8 +185,12 @@ class ClockSkewInterceptorTest {
      */
     inline fun <reified I, reified O> newTestOperation(serialized: HttpRequestBuilder, deserialized: O): SdkHttpOperation<I, O> =
         SdkHttpOperation.build<I, O> {
-            serializer = HttpSerialize<I> { _, _ -> serialized }
-            deserializer = HttpDeserialize<O> { _, _ -> deserialized }
+            serializeWith = object : HttpSerializer.NonStreaming<I> {
+                override fun serialize(context: ExecutionContext, input: I): HttpRequestBuilder = serialized
+            }
+            deserializeWith = object : HttpDeserializer.NonStreaming<O> {
+                override fun deserialize(context: ExecutionContext, call: HttpCall, payload: ByteArray?): O = deserialized
+            }
 
             // required operation context
             operationName = "TestOperation"

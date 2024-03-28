@@ -1,0 +1,5 @@
+{
+    "id": "1332be89-09d8-4b30-9e42-6f7a353c4c72",
+    "type": "misc",
+    "description": "Decrease generated client artifact sizes by reducing the number of suspension points for operations and inlining commonly used HTTP builders"
+}

@@ -31,11 +31,22 @@ import kotlin.reflect.KClass
 public class SdkHttpOperation<I, O> internal constructor(
     public val execution: SdkOperationExecution<I, O>,
     public val context: ExecutionContext,
-    internal val serializer: HttpSerialize<I>,
-    internal val deserializer: HttpDeserialize<O>,
+    internal val serializer: HttpSerializer<I>,
+    internal val deserializer: HttpDeserializer<O>,
     internal val typeInfo: OperationTypeInfo,
     internal val telemetry: SdkOperationTelemetry,
 ) {
+
+    @Suppress("DEPRECATION")
+    internal constructor(
+        execution: SdkOperationExecution<I, O>,
+        context: ExecutionContext,
+        serializer: HttpSerialize<I>,
+        deserializer: HttpDeserialize<O>,
+        typeInfo: OperationTypeInfo,
+        telemetry: SdkOperationTelemetry,
+    ) : this(execution, context, serializer.intoSerializer(), deserializer.intoDeserializer(), typeInfo, telemetry)
+
     init {
         context[HttpOperationContext.SdkInvocationId] = Uuid.random().toString()
     }
@@ -121,8 +132,27 @@ public class SdkHttpOperationBuilder<I, O> (
     private val outputType: KClass<*>,
 ) {
     public val telemetry: SdkOperationTelemetry = SdkOperationTelemetry()
+
+    @Suppress("DEPRECATION")
+    @Deprecated("use serializeWith")
     public var serializer: HttpSerialize<I>? = null
+        set(value) {
+            field = value
+            serializeWith = value?.intoSerializer()
+        }
+
+    public var serializeWith: HttpSerializer<I>? = null
+
+    @Suppress("DEPRECATION")
+    @Deprecated("use deserializeWith")
     public var deserializer: HttpDeserialize<O>? = null
+        set(value) {
+            field = value
+            deserializeWith = value?.intoDeserializer()
+        }
+
+    public var deserializeWith: HttpDeserializer<O>? = null
+
     public val execution: SdkOperationExecution<I, O> = SdkOperationExecution()
     public val context: ExecutionContext = ExecutionContext()
 
@@ -142,8 +172,8 @@ public class SdkHttpOperationBuilder<I, O> (
     public var hostPrefix: String? = null
 
     public fun build(): SdkHttpOperation<I, O> {
-        val opSerializer = requireNotNull(serializer) { "SdkHttpOperation.serializer must not be null" }
-        val opDeserializer = requireNotNull(deserializer) { "SdkHttpOperation.deserializer must not be null" }
+        val opSerializer = requireNotNull(serializeWith) { "SdkHttpOperation.serializeWith must not be null" }
+        val opDeserializer = requireNotNull(deserializeWith) { "SdkHttpOperation.deserializeWith must not be null" }
         requireNotNull(operationName) { "operationName is a required HTTP execution attribute" }
         requireNotNull(serviceName) { "serviceName is a required HTTP execution attribute" }
         context[SdkClientOption.OperationName] = operationName!!

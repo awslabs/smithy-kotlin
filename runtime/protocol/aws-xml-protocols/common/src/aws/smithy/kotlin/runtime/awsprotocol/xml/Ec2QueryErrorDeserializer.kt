@@ -13,8 +13,12 @@ internal data class Ec2QueryErrorResponse(val errors: List<Ec2QueryError>, val r
 
 internal data class Ec2QueryError(val code: String?, val message: String?)
 
+@Deprecated("use parseEc2QueryErrorResponseNoSuspend")
 @InternalApi
-public suspend fun parseEc2QueryErrorResponse(payload: ByteArray): ErrorDetails {
+public suspend fun parseEc2QueryErrorResponse(payload: ByteArray): ErrorDetails =
+    parseEc2QueryErrorResponseNoSuspend(payload)
+
+public fun parseEc2QueryErrorResponseNoSuspend(payload: ByteArray): ErrorDetails {
     val response = Ec2QueryErrorResponseDeserializer.deserialize(xmlTagReader(payload))
     val firstError = response.errors.firstOrNull()
     return ErrorDetails(firstError?.code, firstError?.message, response.requestId)

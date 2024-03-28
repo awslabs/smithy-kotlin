@@ -8,7 +8,9 @@ package aws.smithy.kotlin.runtime.http.operation
 import aws.smithy.kotlin.runtime.ErrorMetadata
 import aws.smithy.kotlin.runtime.ServiceErrorMetadata
 import aws.smithy.kotlin.runtime.ServiceException
+import aws.smithy.kotlin.runtime.http.HttpCall
 import aws.smithy.kotlin.runtime.http.request.HttpRequestBuilder
+import aws.smithy.kotlin.runtime.operation.ExecutionContext
 
 /**
  * Create a new test operation using [serialized] as the already serialized version of the input type [I]
@@ -16,8 +18,12 @@ import aws.smithy.kotlin.runtime.http.request.HttpRequestBuilder
  */
 inline fun <reified I, reified O> newTestOperation(serialized: HttpRequestBuilder, deserialized: O): SdkHttpOperation<I, O> =
     SdkHttpOperation.build<I, O> {
-        serializer = HttpSerialize<I> { _, _ -> serialized }
-        deserializer = HttpDeserialize<O> { _, _ -> deserialized }
+        serializeWith = object : HttpSerializer.NonStreaming<I> {
+            override fun serialize(context: ExecutionContext, input: I): HttpRequestBuilder = serialized
+        }
+        deserializeWith = object : HttpDeserializer.NonStreaming<O> {
+            override fun deserialize(context: ExecutionContext, call: HttpCall, payload: ByteArray?): O = deserialized
+        }
 
         // required operation context
         operationName = "TestOperation"

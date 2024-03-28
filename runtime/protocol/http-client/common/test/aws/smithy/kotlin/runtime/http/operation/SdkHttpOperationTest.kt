@@ -34,6 +34,7 @@ class SdkHttpOperationTest {
     @Test
     fun testMissingRequiredProperties() = runTest {
         val ex = assertFailsWith<IllegalArgumentException> {
+            @Suppress("DEPRECATION")
             SdkHttpOperation.build<Unit, Unit> {
                 serializer = UnitSerializer
                 deserializer = UnitDeserializer

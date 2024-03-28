@@ -416,9 +416,10 @@ private fun buildOperation(
     serialized: HttpRequestBuilder,
 ): SdkHttpOperation<Unit, HttpResponse> {
     val op = SdkHttpOperation.build<Unit, HttpResponse> {
-        serializer = object : HttpSerialize<Unit> {
-            override suspend fun serialize(context: ExecutionContext, input: Unit): HttpRequestBuilder = serialized
+        serializeWith = object : HttpSerializer.NonStreaming<Unit> {
+            override fun serialize(context: ExecutionContext, input: Unit): HttpRequestBuilder = serialized
         }
+        @Suppress("DEPRECATION")
         deserializer = IdentityDeserializer
 
         context {

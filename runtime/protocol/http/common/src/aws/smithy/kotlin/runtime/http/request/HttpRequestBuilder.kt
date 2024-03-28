@@ -67,7 +67,7 @@ public fun HttpRequestBuilder.immutableView(
 /**
  * Modify the URL inside the block
  */
-public fun HttpRequestBuilder.url(block: Url.Builder.() -> Unit) {
+public inline fun HttpRequestBuilder.url(block: Url.Builder.() -> Unit) {
     url.apply(block)
 }
 
@@ -81,7 +81,7 @@ public fun HttpRequestBuilder.url(value: Url) {
 /**
  * Modify the headers inside the given block
  */
-public fun HttpRequestBuilder.headers(block: HeadersBuilder.() -> Unit) {
+public inline fun HttpRequestBuilder.headers(block: HeadersBuilder.() -> Unit) {
     headers.apply(block)
 }
 

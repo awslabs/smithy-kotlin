@@ -20,6 +20,7 @@ class AwsJsonProtocolTest {
 
     @Test
     fun testSetJsonProtocolHeaders() = runTest {
+        @Suppress("DEPRECATION")
         val op = SdkHttpOperation.build<Unit, HttpResponse> {
             serializer = UnitSerializer
             deserializer = IdentityDeserializer
@@ -41,6 +42,7 @@ class AwsJsonProtocolTest {
 
     @Test
     fun testEmptyBody() = runTest {
+        @Suppress("DEPRECATION")
         val op = SdkHttpOperation.build<Unit, HttpResponse> {
             serializer = UnitSerializer
             deserializer = IdentityDeserializer
@@ -59,6 +61,7 @@ class AwsJsonProtocolTest {
 
     @Test
     fun testDoesNotOverride() = runTest {
+        @Suppress("DEPRECATION")
         val op = SdkHttpOperation.build<Unit, HttpResponse> {
             serializer = object : HttpSerialize<Unit> {
                 override suspend fun serialize(context: ExecutionContext, input: Unit): HttpRequestBuilder =

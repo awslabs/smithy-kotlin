@@ -36,7 +36,7 @@ public class QueryParameters private constructor(
          * @param block The code to apply to the builder
          * @return A new [QueryParameters] instance
          */
-        public operator fun invoke(block: Builder.() -> Unit): QueryParameters = Builder().apply(block).build()
+        public inline operator fun invoke(block: Builder.() -> Unit): QueryParameters = Builder().apply(block).build()
 
         private fun asDecoded(values: Sequence<Map.Entry<Encodable, Encodable>>, forceQuerySeparator: Boolean) =
             asString(values, forceQuerySeparator, Encodable::decoded)
@@ -198,7 +198,7 @@ public class QueryParameters private constructor(
          * Applies the given DSL block to the decoded query parameters. Changes to this map are reflected in the
          * [encodedParameters] map as well.
          */
-        public fun decodedParameters(block: MutableMultiMap<String, String>.() -> Unit) {
+        public inline fun decodedParameters(block: MutableMultiMap<String, String>.() -> Unit) {
             decodedParameters.apply(block)
         }
 
@@ -231,7 +231,7 @@ public class QueryParameters private constructor(
          * Applies the given DSL block to the encoded query parameters. Changes to this map are reflected in the
          * [decodedParameters] map as well.
          */
-        public fun encodedParameters(block: MutableMultiMap<String, String>.() -> Unit) {
+        public inline fun encodedParameters(block: MutableMultiMap<String, String>.() -> Unit) {
             encodedParameters.apply(block)
         }
 

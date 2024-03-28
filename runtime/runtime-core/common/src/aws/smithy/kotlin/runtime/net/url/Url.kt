@@ -36,7 +36,7 @@ public class Url private constructor(
          * @param block The code to apply to the builder
          * @return A new [Url] instance
          */
-        public operator fun invoke(block: Builder.() -> Unit): Url = Builder().apply(block).build()
+        public inline operator fun invoke(block: Builder.() -> Unit): Url = Builder().apply(block).build()
 
         /**
          * Parse a URL string into a [Url] instance
@@ -252,7 +252,7 @@ public class Url private constructor(
          * Update the [UrlPath] of this URL via a DSL builder block
          * @param block The code to apply to the [UrlPath] builder
          */
-        public fun path(block: UrlPath.Builder.() -> Unit) {
+        public inline fun path(block: UrlPath.Builder.() -> Unit) {
             path.apply(block)
         }
 
@@ -267,7 +267,7 @@ public class Url private constructor(
          * Update the [QueryParameters] of this URL via a DSL builder block
          * @param block The code to apply to the [QueryParameters] builder
          */
-        public fun parameters(block: QueryParameters.Builder.() -> Unit) {
+        public inline fun parameters(block: QueryParameters.Builder.() -> Unit) {
             parameters.apply(block)
         }
 
@@ -282,7 +282,7 @@ public class Url private constructor(
          * Set the user info in this URL via a DSL builder block
          * @param block The code to apply to the [UserInfo] builder
          */
-        public fun userInfo(block: UserInfo.Builder.() -> Unit) {
+        public inline fun userInfo(block: UserInfo.Builder.() -> Unit) {
             userInfo.apply(block)
         }
 

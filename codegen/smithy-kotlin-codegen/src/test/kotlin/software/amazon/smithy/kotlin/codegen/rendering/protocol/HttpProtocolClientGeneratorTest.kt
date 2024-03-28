@@ -78,8 +78,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFoo(input: GetFooRequest): GetFooResponse {
         val op = SdkHttpOperation.build<GetFooRequest, GetFooResponse> {
-            serializer = GetFooOperationSerializer()
-            deserializer = GetFooOperationDeserializer()
+            serializeWith = GetFooOperationSerializer()
+            deserializeWith = GetFooOperationDeserializer()
             operationName = "GetFoo"
             serviceName = ServiceId
             telemetry {
@@ -101,8 +101,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFooNoInput(input: GetFooNoInputRequest): GetFooNoInputResponse {
         val op = SdkHttpOperation.build<GetFooNoInputRequest, GetFooNoInputResponse> {
-            serializer = GetFooNoInputOperationSerializer()
-            deserializer = GetFooNoInputOperationDeserializer()
+            serializeWith = GetFooNoInputOperationSerializer()
+            deserializeWith = GetFooNoInputOperationDeserializer()
             operationName = "GetFooNoInput"
             serviceName = ServiceId
             telemetry {
@@ -124,8 +124,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFooNoOutput(input: GetFooNoOutputRequest): GetFooNoOutputResponse {
         val op = SdkHttpOperation.build<GetFooNoOutputRequest, GetFooNoOutputResponse> {
-            serializer = GetFooNoOutputOperationSerializer()
-            deserializer = GetFooNoOutputOperationDeserializer()
+            serializeWith = GetFooNoOutputOperationSerializer()
+            deserializeWith = GetFooNoOutputOperationDeserializer()
             operationName = "GetFooNoOutput"
             serviceName = ServiceId
             telemetry {
@@ -147,8 +147,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFooStreamingInput(input: GetFooStreamingInputRequest): GetFooStreamingInputResponse {
         val op = SdkHttpOperation.build<GetFooStreamingInputRequest, GetFooStreamingInputResponse> {
-            serializer = GetFooStreamingInputOperationSerializer()
-            deserializer = GetFooStreamingInputOperationDeserializer()
+            serializeWith = GetFooStreamingInputOperationSerializer()
+            deserializeWith = GetFooStreamingInputOperationDeserializer()
             operationName = "GetFooStreamingInput"
             serviceName = ServiceId
             telemetry {
@@ -170,8 +170,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun <T> getFooStreamingOutput(input: GetFooStreamingOutputRequest, block: suspend (GetFooStreamingOutputResponse) -> T): T {
         val op = SdkHttpOperation.build<GetFooStreamingOutputRequest, GetFooStreamingOutputResponse> {
-            serializer = GetFooStreamingOutputOperationSerializer()
-            deserializer = GetFooStreamingOutputOperationDeserializer()
+            serializeWith = GetFooStreamingOutputOperationSerializer()
+            deserializeWith = GetFooStreamingOutputOperationDeserializer()
             operationName = "GetFooStreamingOutput"
             serviceName = ServiceId
             telemetry {
@@ -193,8 +193,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun <T> getFooStreamingOutputNoInput(input: GetFooStreamingOutputNoInputRequest, block: suspend (GetFooStreamingOutputNoInputResponse) -> T): T {
         val op = SdkHttpOperation.build<GetFooStreamingOutputNoInputRequest, GetFooStreamingOutputNoInputResponse> {
-            serializer = GetFooStreamingOutputNoInputOperationSerializer()
-            deserializer = GetFooStreamingOutputNoInputOperationDeserializer()
+            serializeWith = GetFooStreamingOutputNoInputOperationSerializer()
+            deserializeWith = GetFooStreamingOutputNoInputOperationDeserializer()
             operationName = "GetFooStreamingOutputNoInput"
             serviceName = ServiceId
             telemetry {
@@ -216,8 +216,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFooStreamingInputNoOutput(input: GetFooStreamingInputNoOutputRequest): GetFooStreamingInputNoOutputResponse {
         val op = SdkHttpOperation.build<GetFooStreamingInputNoOutputRequest, GetFooStreamingInputNoOutputResponse> {
-            serializer = GetFooStreamingInputNoOutputOperationSerializer()
-            deserializer = GetFooStreamingInputNoOutputOperationDeserializer()
+            serializeWith = GetFooStreamingInputNoOutputOperationSerializer()
+            deserializeWith = GetFooStreamingInputNoOutputOperationDeserializer()
             operationName = "GetFooStreamingInputNoOutput"
             serviceName = ServiceId
             telemetry {
@@ -239,8 +239,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFooNoRequired(input: GetFooNoRequiredRequest): GetFooNoRequiredResponse {
         val op = SdkHttpOperation.build<GetFooNoRequiredRequest, GetFooNoRequiredResponse> {
-            serializer = GetFooNoRequiredOperationSerializer()
-            deserializer = GetFooNoRequiredOperationDeserializer()
+            serializeWith = GetFooNoRequiredOperationSerializer()
+            deserializeWith = GetFooNoRequiredOperationDeserializer()
             operationName = "GetFooNoRequired"
             serviceName = ServiceId
             telemetry {
@@ -262,8 +262,8 @@ class HttpProtocolClientGeneratorTest {
 """
     override suspend fun getFooSomeRequired(input: GetFooSomeRequiredRequest): GetFooSomeRequiredResponse {
         val op = SdkHttpOperation.build<GetFooSomeRequiredRequest, GetFooSomeRequiredResponse> {
-            serializer = GetFooSomeRequiredOperationSerializer()
-            deserializer = GetFooSomeRequiredOperationDeserializer()
+            serializeWith = GetFooSomeRequiredOperationSerializer()
+            deserializeWith = GetFooSomeRequiredOperationDeserializer()
             operationName = "GetFooSomeRequired"
             serviceName = ServiceId
             telemetry {
@@ -341,8 +341,8 @@ class HttpProtocolClientGeneratorTest {
         val prefix = "\${input.foo}.data."
         val expectedFragment = """
         val op = SdkHttpOperation.build<GetStatusRequest, GetStatusResponse> {
-            serializer = GetStatusOperationSerializer()
-            deserializer = GetStatusOperationDeserializer()
+            serializeWith = GetStatusOperationSerializer()
+            deserializeWith = GetStatusOperationDeserializer()
             operationName = "GetStatus"
             serviceName = ServiceId
             hostPrefix = "$prefix"

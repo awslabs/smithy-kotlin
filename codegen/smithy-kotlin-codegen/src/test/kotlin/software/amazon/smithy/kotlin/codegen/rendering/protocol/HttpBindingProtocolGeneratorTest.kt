@@ -41,8 +41,8 @@ class HttpBindingProtocolGeneratorTest {
         contents.assertBalancedBracesAndParens()
         val label1 = "\${input.label1}" // workaround for raw strings not being able to contain escapes
         val expectedContents = """
-internal class SmokeTestOperationSerializer: HttpSerialize<SmokeTestRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: SmokeTestRequest): HttpRequestBuilder {
+internal class SmokeTestOperationSerializer: HttpSerializer.NonStreaming<SmokeTestRequest> {
+    override fun serialize(context: ExecutionContext, input: SmokeTestRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -81,8 +81,8 @@ internal class SmokeTestOperationSerializer: HttpSerialize<SmokeTestRequest> {
         val contents = getSerdeFileContents("ExplicitStringOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class ExplicitStringOperationSerializer: HttpSerialize<ExplicitStringRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: ExplicitStringRequest): HttpRequestBuilder {
+internal class ExplicitStringOperationSerializer: HttpSerializer.NonStreaming<ExplicitStringRequest> {
+    override fun serialize(context: ExecutionContext, input: ExplicitStringRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -108,8 +108,8 @@ internal class ExplicitStringOperationSerializer: HttpSerialize<ExplicitStringRe
         val contents = getSerdeFileContents("ExplicitBlobOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class ExplicitBlobOperationSerializer: HttpSerialize<ExplicitBlobRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: ExplicitBlobRequest): HttpRequestBuilder {
+internal class ExplicitBlobOperationSerializer: HttpSerializer.NonStreaming<ExplicitBlobRequest> {
+    override fun serialize(context: ExecutionContext, input: ExplicitBlobRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -135,8 +135,8 @@ internal class ExplicitBlobOperationSerializer: HttpSerialize<ExplicitBlobReques
         val contents = getSerdeFileContents("ExplicitBlobStreamOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class ExplicitBlobStreamOperationSerializer: HttpSerialize<ExplicitBlobStreamRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: ExplicitBlobStreamRequest): HttpRequestBuilder {
+internal class ExplicitBlobStreamOperationSerializer: HttpSerializer.NonStreaming<ExplicitBlobStreamRequest> {
+    override fun serialize(context: ExecutionContext, input: ExplicitBlobStreamRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -162,8 +162,8 @@ internal class ExplicitBlobStreamOperationSerializer: HttpSerialize<ExplicitBlob
         val contents = getSerdeFileContents("ExplicitStructOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class ExplicitStructOperationSerializer: HttpSerialize<ExplicitStructRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: ExplicitStructRequest): HttpRequestBuilder {
+internal class ExplicitStructOperationSerializer: HttpSerializer.NonStreaming<ExplicitStructRequest> {
+    override fun serialize(context: ExecutionContext, input: ExplicitStructRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -190,8 +190,8 @@ internal class ExplicitStructOperationSerializer: HttpSerialize<ExplicitStructRe
         val contents = getSerdeFileContents("ExplicitDocumentOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class ExplicitDocumentOperationSerializer: HttpSerialize<ExplicitDocumentRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: ExplicitDocumentRequest): HttpRequestBuilder {
+internal class ExplicitDocumentOperationSerializer: HttpSerializer.NonStreaming<ExplicitDocumentRequest> {
+    override fun serialize(context: ExecutionContext, input: ExplicitDocumentRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -218,8 +218,8 @@ internal class ExplicitDocumentOperationSerializer: HttpSerialize<ExplicitDocume
         val contents = getSerdeFileContents("EnumInputOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class EnumInputOperationSerializer: HttpSerialize<EnumInputRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: EnumInputRequest): HttpRequestBuilder {
+internal class EnumInputOperationSerializer: HttpSerializer.NonStreaming<EnumInputRequest> {
+    override fun serialize(context: ExecutionContext, input: EnumInputRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -249,8 +249,8 @@ internal class EnumInputOperationSerializer: HttpSerialize<EnumInputRequest> {
         contents.assertBalancedBracesAndParens()
         val tsLabel = "\${input.tsLabel.format(TimestampFormat.ISO_8601)}" // workaround for raw strings not being able to contain escapes
         val expectedContents = """
-internal class TimestampInputOperationSerializer: HttpSerialize<TimestampInputRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: TimestampInputRequest): HttpRequestBuilder {
+internal class TimestampInputOperationSerializer: HttpSerializer.NonStreaming<TimestampInputRequest> {
+    override fun serialize(context: ExecutionContext, input: TimestampInputRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -292,8 +292,8 @@ internal class TimestampInputOperationSerializer: HttpSerialize<TimestampInputRe
         val contents = getSerdeFileContents("BlobInputOperationSerializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class BlobInputOperationSerializer: HttpSerialize<BlobInputRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: BlobInputRequest): HttpRequestBuilder {
+internal class BlobInputOperationSerializer: HttpSerializer.NonStreaming<BlobInputRequest> {
+    override fun serialize(context: ExecutionContext, input: BlobInputRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.POST
 
@@ -325,8 +325,8 @@ internal class BlobInputOperationSerializer: HttpSerialize<BlobInputRequest> {
         contents.assertBalancedBracesAndParens()
         val label1 = "\${input.hello}" // workaround for raw strings not being able to contain escapes
         val expectedContents = """
-internal class ConstantQueryStringOperationSerializer: HttpSerialize<ConstantQueryStringRequest> {
-    override suspend fun serialize(context: ExecutionContext, input: ConstantQueryStringRequest): HttpRequestBuilder {
+internal class ConstantQueryStringOperationSerializer: HttpSerializer.NonStreaming<ConstantQueryStringRequest> {
+    override fun serialize(context: ExecutionContext, input: ConstantQueryStringRequest): HttpRequestBuilder {
         val builder = HttpRequestBuilder()
         builder.method = HttpMethod.GET
 
@@ -353,12 +353,12 @@ internal class ConstantQueryStringOperationSerializer: HttpSerialize<ConstantQue
         val contents = getSerdeFileContents("SmokeTestOperationDeserializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse> {
+internal class SmokeTestOperationDeserializer: HttpDeserializer.NonStreaming<SmokeTestResponse> {
 
-    override suspend fun deserialize(context: ExecutionContext, call: HttpCall): SmokeTestResponse {
+    override fun deserialize(context: ExecutionContext, call: HttpCall, payload: ByteArray?): SmokeTestResponse {
         val response = call.response
         if (!response.status.isSuccess()) {
-            throwSmokeTestError(context, call)
+            throwSmokeTestError(context, call, payload)
         }
         val builder = SmokeTestResponse.Builder()
 
@@ -366,7 +366,6 @@ internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse
         builder.strHeader = response.headers["X-Header1"]
         builder.tsListHeader = response.headers.getAll("X-Header3")?.flatMap(::splitHttpDateHeaderListValues)?.map { Instant.fromRfc5322(it) }
 
-        val payload = response.body.readAll()
         if (payload != null) {
             deserializeSmokeTestOperationBody(builder, payload)
         }
@@ -418,7 +417,7 @@ internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse
         val contents = getSerdeFileContents("ExplicitStringOperationDeserializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-        val contents = response.body.readAll()?.decodeToString()
+        val contents = payload?.decodeToString()
         builder.payload1 = contents
 """
         contents.shouldContainOnlyOnce(expectedContents)
@@ -429,7 +428,7 @@ internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse
         val contents = getSerdeFileContents("ExplicitEnumOperationDeserializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-        val contents = response.body.readAll()?.decodeToString()
+        val contents = payload?.decodeToString()
         builder.payload1 = contents?.let { MyEnum.fromValue(it) }
 """
         contents.shouldContainOnlyOnce(expectedContents)
@@ -440,7 +439,7 @@ internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse
         val contents = getSerdeFileContents("ExplicitBlobOperationDeserializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-        builder.payload1 = response.body.readAll()
+        builder.payload1 = payload
 """
         contents.shouldContainOnlyOnce(expectedContents)
     }
@@ -460,7 +459,6 @@ internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse
         val contents = getSerdeFileContents("ExplicitStructOperationDeserializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-        val payload = response.body.readAll()
         if (payload != null) {
             builder.payload1 = deserializeNested2Payload(payload)
         }
@@ -473,7 +471,6 @@ internal class SmokeTestOperationDeserializer: HttpDeserialize<SmokeTestResponse
         val contents = getSerdeFileContents("ExplicitDocumentOperationDeserializer.kt")
         contents.assertBalancedBracesAndParens()
         val expectedContents = """
-        val payload = response.body.readAll()
         if (payload != null) {
             builder.payload1 = deserializeDocumentPayload(payload)
         }
